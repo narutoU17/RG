@@ -1,0 +1,63 @@
+def get_companions():
+    """Get all companions (public endpoint)"""
+    try:
+        companions = Companion.query.filter_by(availability=True).all()
+        return jsonify({
+            'companions': [companion.to_dict() for companion in companions]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+=======
+@companion_bp.route('', methods=['GET'])
+def get_companions():
+    """Get all companions (public endpoint)"""
+    try:
+        companions = Companion.query.filter_by(availability=True).all()
+        companions = [c for c in companions if c.user is not None]
+        return jsonify({
+            'companions': [companion.to_dict() for companion in companions]
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+>>>>>>> REPLACE
+
+<<<<<<< SEARCH
+@companion_bp.route('/<int:companion_id>', methods=['GET'])
+def get_companion(companion_id):
+    """Get companion details by ID"""
+    try:
+        companion = Companion.query.get(companion_id)
+        
+        if not companion:
+            return jsonify({'error': 'Companion not found'}), 404
+        
+        return jsonify({'companion': companion.to_dict()}), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+=======
+@companion_bp.route('/cities', methods=['GET'])
+def get_companion_cities():
+    """Get distinct cities where companions have signed up and are available"""
+    try:
+        cities_query = db.session.query(User.city).join(Companion, User.id == Companion.user_id).filter(Companion.availability == True).distinct()
+        cities = [city for (city,) in cities_query if city]
+        return jsonify({'cities': cities}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@companion_bp.route('/<int:companion_id>', methods=['GET'])
+def get_companion(companion_id):
+    """Get companion details by ID"""
+    try:
+        companion = Companion.query.get(companion_id)
+        
+        if not companion:
+            return jsonify({'error': 'Companion not found'}), 404
+        
+        return jsonify({'companion': companion.to_dict()}), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500

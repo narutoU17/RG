@@ -1,0 +1,274 @@
+.dashboard-container {
+  min-height: 100vh;
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header h1 {
+  color: #333;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  background: white;
+  color: #667eea;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-secondary:hover {
+  background: #667eea;
+  color: white;
+}
+
+.btn-logout {
+  padding: 10px 20px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn-logout:hover {
+  background: #c0392b;
+}
+
+.user-info {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.user-info h2 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.user-info p {
+  color: #666;
+  margin-bottom: 8px;
+}
+
+.companion-profile-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.companion-profile-section h3 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.current-profile {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.current-profile h4 {
+  color: #333;
+  margin-bottom: 15px;
+}
+
+.current-profile p {
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.profile-image-preview {
+  margin-top: 15px;
+}
+
+.profile-image-preview img {
+  max-width: 200px;
+  max-height: 200px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.companion-form {
+  max-width: 600px;
+}
+
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.bookings-section {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.bookings-section h3 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.bookings-list {
+  display: grid;
+  gap: 20px;
+}
+
+.booking-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  border-left: 4px solid #667eea;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s;
+}
+
+.booking-card:hover {
+  transform: translateX(5px);
+}
+
+.booking-card.status-pending {
+  border-left-color: #f39c12;
+}
+
+.booking-card.status-approved {
+  border-left-color: #27ae60;
+}
+
+.booking-card.status-rejected {
+  border-left-color: #e74c3c;
+}
+
+.booking-info h4 {
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.booking-info p {
+  color: #666;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.approved {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.booking-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-approve,
+.btn-reject,
+.btn-delete {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-approve {
+  background: #27ae60;
+  color: white;
+}
+
+.btn-approve:hover {
+  background: #229954;
+}
+
+.btn-reject {
+  background: #e74c3c;
+  color: white;
+}
+
+.btn-reject:hover {
+  background: #c0392b;
+}
+
+.btn-delete {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #7f8c8d;
+}
+
+@media (max-width: 768px) {
+  .booking-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .booking-actions {
+    margin-top: 15px;
+    width: 100%;
+  }
+  
+  .booking-actions button {
+    flex: 1;
+  }
+}
