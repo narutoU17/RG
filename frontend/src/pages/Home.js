@@ -55,12 +55,12 @@ function Home() {
             </button>
           ) : (
             <>
-              <button onClick={() => navigate('/companions')} className="btn-primary btn-large">
+              {/* <button onClick={() => navigate('/companions')} className="btn-primary btn-large">
                 Browse Companions
               </button>
               <button onClick={() => navigate('/signup')} className="btn-secondary btn-large">
                 Join as Companion
-              </button>
+              </button> */}
             </>
           )}
         </div>
