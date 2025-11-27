@@ -1,0 +1,423 @@
+================================================================================
+BONDMATE - COMPLETE INSTALLATION COMMANDS (COPY-PASTE READY)
+================================================================================
+
+This file contains ALL commands needed to install and run BondMate from scratch.
+Simply copy and paste each section into your terminal.
+
+================================================================================
+SECTION 1: INSTALL PYTHON 3
+================================================================================
+
+# Update package list
+sudo apt update
+
+# Install Python 3, pip, and venv
+sudo apt install -y python3 python3-pip python3-venv
+
+# Verify Python installation
+python3 --version
+
+# Should output something like: Python 3.8.10 or higher
+
+
+================================================================================
+SECTION 2: INSTALL NODE.JS AND NPM
+================================================================================
+
+# Install Node.js and npm
+sudo apt install -y nodejs npm
+
+# Verify Node.js installation
+node --version
+
+# Should output something like: v14.x.x or higher
+
+# Verify npm installation
+npm --version
+
+# Should output something like: 6.x.x or higher
+
+
+================================================================================
+SECTION 3: INSTALL POSTGRESQL
+================================================================================
+
+# Install PostgreSQL and related packages
+sudo apt install -y postgresql postgresql-contrib
+
+# Verify PostgreSQL installation
+psql --version
+
+# Should output something like: psql (PostgreSQL) 12.x or higher
+
+# Start PostgreSQL service
+sudo systemctl start postgresql
+
+# Enable PostgreSQL to start on boot
+sudo systemctl enable postgresql
+
+# Check PostgreSQL status
+sudo systemctl status postgresql
+
+# Press 'q' to exit status view
+
+
+================================================================================
+SECTION 4: CREATE DATABASE AND USER
+================================================================================
+
+# Connect to PostgreSQL as postgres user and create database
+sudo -u postgres psql << EOF
+DROP DATABASE IF EXISTS bondmate;
+CREATE DATABASE bondmate;
+CREATE USER bondmate_user WITH PASSWORD 'bondmate123';
+GRANT ALL PRIVILEGES ON DATABASE bondmate TO bondmate_user;
+\q
+EOF
+
+# Verify database was created
+sudo -u postgres psql -l | grep bondmate
+
+# Should show the bondmate database in the list
+
+
+================================================================================
+SECTION 5: SETUP BACKEND (FLASK)
+================================================================================
+
+# Navigate to your BondMate project backend directory
+cd /path/to/BondMate/backend
+
+# Create Python virtual environment
+python3 -m venv venv
+
+# Activate virtual environment
+source venv/bin/activate
+
+# You should see (venv) in your terminal prompt now
+
+# Upgrade pip to latest version
+pip install --upgrade pip
+
+# Install all Python dependencies from requirements.txt
+pip install -r requirements.txt
+
+# This will install:
+# - Flask==2.3.3
+# - Flask-CORS==4.0.0
+# - Flask-JWT-Extended==4.5.2
+# - Flask-SQLAlchemy==3.0.5
+# - psycopg2-binary==2.9.7
+# - bcrypt==4.0.1
+# - python-dotenv==1.0.0
+
+# Create .env configuration file
+cat > .env << 'EOF'
+DATABASE_URL=postgresql://bondmate_user:bondmate123@localhost:5432/bondmate
+JWT_SECRET_KEY=bondmate-super-secret-jwt-key-change-in-production
+FLASK_ENV=development
+EOF
+
+# Create __init__.py files for Python packages
+touch controllers/__init__.py
+touch utils/__init__.py
+
+# Test backend (this will start the Flask server)
+python3 app.py
+
+# You should see:
+# * Running on http://0.0.0.0:5000
+# Database tables created successfully!
+
+# Press Ctrl+C to stop the server
+
+
+================================================================================
+SECTION 6: SETUP FRONTEND (REACT)
+================================================================================
+
+# Open a NEW terminal window (keep backend terminal available)
+
+# Navigate to your BondMate project frontend directory
+cd /path/to/BondMate/frontend
+
+# Install all npm dependencies from package.json
+npm install
+
+# This will install:
+# - react@18.2.0
+# - react-dom@18.2.0
+# - react-router-dom@6.14.2
+# - axios@1.4.0
+# - react-scripts@5.0.1
+# - And all their dependencies
+
+# This may take 2-5 minutes depending on your internet speed
+
+# Test frontend (this will start the React development server)
+npm start
+
+# You should see:
+# Compiled successfully!
+# Local: http://localhost:3000
+
+# Your browser should automatically open to http://localhost:3000
+
+# Press Ctrl+C to stop the server
+
+
+================================================================================
+SECTION 7: CREATE START SCRIPTS (OPTIONAL BUT RECOMMENDED)
+================================================================================
+
+# Navigate back to BondMate root directory
+cd /path/to/BondMate
+
+# Create backend start script
+cat > start_backend.sh << 'EOF'
+#!/bin/bash
+cd backend
+source venv/bin/activate
+python3 app.py
+EOF
+
+# Make it executable
+chmod +x start_backend.sh
+
+# Create frontend start script
+cat > start_frontend.sh << 'EOF'
+#!/bin/bash
+cd frontend
+npm start
+EOF
+
+# Make it executable
+chmod +x start_frontend.sh
+
+# Create combined start script
+cat > start_all.sh << 'EOF'
+#!/bin/bash
+
+echo "Starting BondMate Backend..."
+cd backend
+source venv/bin/activate
+python3 app.py &
+BACKEND_PID=$!
+cd ..
+
+echo "Waiting for backend to start..."
+sleep 3
+
+echo "Starting BondMate Frontend..."
+cd frontend
+npm start
+
+# Kill backend when frontend stops
+kill $BACKEND_PID
+EOF
+
+# Make it executable
+chmod +x start_all.sh
+
+
+================================================================================
+SECTION 8: RUNNING THE APPLICATION
+================================================================================
+
+# METHOD 1: Start both together (recommended)
+./start_all.sh
+
+# METHOD 2: Start separately in two terminals
+
+# Terminal 1 (Backend):
+cd /path/to/BondMate
+./start_backend.sh
+
+# Terminal 2 (Frontend):
+cd /path/to/BondMate
+./start_frontend.sh
+
+# METHOD 3: Manual start
+
+# Terminal 1 (Backend):
+cd /path/to/BondMate/backend
+source venv/bin/activate
+python3 app.py
+
+# Terminal 2 (Frontend):
+cd /path/to/BondMate/frontend
+npm start
+
+
+================================================================================
+SECTION 9: VERIFY INSTALLATION
+================================================================================
+
+# Test Backend API
+curl http://localhost:5000/
+
+# Should return JSON like:
+# {"message":"BondMate API - Companion Booking Platform","version":"1.0.0",...}
+
+# Test Frontend
+# Open browser and navigate to: http://localhost:3000
+# You should see the BondMate homepage
+
+
+================================================================================
+SECTION 10: CREATE YOUR FIRST USER
+================================================================================
+
+1. Open http://localhost:3000 in your browser
+2. Click "Sign Up"
+3. Fill in the form:
+   - Full Name: Your Name
+   - Email: your@email.com
+   - Password: yourpassword
+   - Role: Select "Admin" (for admin) or "User" (for regular user)
+   - State: Select your state
+   - District: Select your district (appears after selecting state)
+   - Age: Your age (18+)
+   - Interests: e.g., "Music, Sports, Movies, Travel"
+4. Click "Sign Up"
+5. You should be automatically logged in and redirected to Dashboard
+
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+ISSUE: Port 5000 already in use
+SOLUTION:
+# Edit backend/app.py and change the port:
+# Find this line: app.run(debug=True, host='0.0.0.0', port=5000)
+# Change to: app.run(debug=True, host='0.0.0.0', port=5001)
+# Then update frontend/src/api.js:
+# Change: const API_URL = 'http://localhost:5000/api';
+# To: const API_URL = 'http://localhost:5001/api';
+
+ISSUE: Port 3000 already in use
+SOLUTION:
+# When npm start asks "Would you like to run the app on another port instead?"
+# Type: y
+# It will use port 3001
+
+ISSUE: PostgreSQL connection error
+SOLUTION:
+# Check if PostgreSQL is running
+sudo systemctl status postgresql
+
+# If not running, start it
+sudo systemctl start postgresql
+
+# Verify database exists
+sudo -u postgres psql -l | grep bondmate
+
+ISSUE: Module not found (Python)
+SOLUTION:
+cd backend
+source venv/bin/activate
+pip install -r requirements.txt
+
+ISSUE: Module not found (Node)
+SOLUTION:
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+
+ISSUE: Database schema error
+SOLUTION:
+# Drop and recreate database
+sudo -u postgres psql << EOF
+DROP DATABASE bondmate;
+CREATE DATABASE bondmate;
+GRANT ALL PRIVILEGES ON DATABASE bondmate TO bondmate_user;
+\q
+EOF
+
+# Restart backend (it will recreate tables automatically)
+cd backend
+source venv/bin/activate
+python3 app.py
+
+ISSUE: Permission denied on scripts
+SOLUTION:
+chmod +x start_all.sh
+chmod +x start_backend.sh
+chmod +x start_frontend.sh
+
+
+================================================================================
+STOP COMMANDS
+================================================================================
+
+# Stop Backend: Press Ctrl+C in the terminal running Flask
+# Stop Frontend: Press Ctrl+C in the terminal running React
+# Stop All: Press Ctrl+C in the terminal running start_all.sh
+
+# Kill any remaining processes on port 5000
+sudo lsof -ti:5000 | xargs kill -9
+
+# Kill any remaining processes on port 3000
+sudo lsof -ti:3000 | xargs kill -9
+
+
+================================================================================
+UNINSTALL COMMANDS (if needed)
+================================================================================
+
+# Remove virtual environment
+rm -rf backend/venv
+
+# Remove node_modules
+rm -rf frontend/node_modules
+
+# Remove database
+sudo -u postgres psql -c "DROP DATABASE bondmate;"
+sudo -u postgres psql -c "DROP USER bondmate_user;"
+
+# Uninstall system packages (CAREFUL - may affect other projects)
+# sudo apt remove python3-pip python3-venv nodejs npm postgresql
+
+
+================================================================================
+SYSTEM REQUIREMENTS
+================================================================================
+
+Minimum:
+- CPU: 2 cores
+- RAM: 2 GB
+- Disk: 5 GB free space
+- OS: Ubuntu 20.04+ / Debian 10+
+
+Recommended:
+- CPU: 4 cores
+- RAM: 4 GB
+- Disk: 10 GB free space
+- OS: Ubuntu 22.04 LTS
+
+
+================================================================================
+ACCESS POINTS
+================================================================================
+
+Frontend: http://localhost:3000
+Backend API: http://localhost:5000
+API Info: http://localhost:5000/
+
+Database:
+  Host: localhost
+  Port: 5432
+  Database: bondmate
+  User: bondmate_user
+  Password: bondmate123
+
+
+================================================================================
+END OF INSTALLATION COMMANDS
+================================================================================
+
+Installation complete! You can now run: ./start_all.sh
+
+For issues, refer to the troubleshooting section above.
