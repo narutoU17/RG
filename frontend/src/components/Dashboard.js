@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getBookings, getAllBookings, approveBooking, rejectBooking, deleteBooking, createCompanion, updateCompanion } from '../api';
 import axios from 'axios';
+import ChatWindow from './ChatWindow';
 import './Dashboard.css';
 
 function Dashboard() {
@@ -12,11 +13,11 @@ function Dashboard() {
   const [companionProfile, setCompanionProfile] = useState(null);
   const [companionForm, setCompanionForm] = useState({
     bio: '',
-    price_per_hour: '',
     image_url: '',
     availability: true
   });
   const [isEditing, setIsEditing] = useState(false);
+  const [activeChatBookingId, setActiveChatBookingId] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -40,7 +41,6 @@ function Dashboard() {
       setCompanionProfile(response.data.companion);
       setCompanionForm({
         bio: response.data.companion.bio || '',
-        price_per_hour: response.data.companion.price_per_hour || '',
         image_url: response.data.companion.image_url || '',
         availability: response.data.companion.availability
       });
@@ -165,8 +165,8 @@ function Dashboard() {
             <div className="current-profile">
               <h4>Current Profile:</h4>
               <p><strong>Bio:</strong> {companionProfile.bio}</p>
-              <p><strong>Price:</strong> ${companionProfile.price_per_hour}/hour</p>
               <p><strong>Status:</strong> {companionProfile.availability ? 'Available' : 'Unavailable'}</p>
+              <p className="pricing-info">💰 All sessions are 15 minutes at ₹299</p>
               {companionProfile.image_url && (
                 <div className="profile-image-preview">
                   <img src={companionProfile.image_url} alt="Profile" />
@@ -176,6 +176,10 @@ function Dashboard() {
           )}
 
           <form onSubmit={handleCompanionSubmit} className="companion-form">
+            <div className="pricing-notice">
+              <strong>📌 Standard Pricing:</strong> All sessions are 15 minutes at ₹299
+            </div>
+            
             <div className="form-group">
               <label>Bio</label>
               <textarea
@@ -185,18 +189,6 @@ function Dashboard() {
                 placeholder="Tell about yourself"
                 rows="4"
                 required
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Price Per Hour ($)</label>
-              <input
-                type="number"
-                name="price_per_hour"
-                value={companionForm.price_per_hour}
-                onChange={handleCompanionChange}
-                required
-                min="1"
               />
             </div>
             
@@ -244,11 +236,19 @@ function Dashboard() {
                   <p><strong>User:</strong> {booking.user_name}</p>
                   <p><strong>Companion:</strong> {booking.companion_name}</p>
                   <p><strong>Date:</strong> {new Date(booking.date).toLocaleString()}</p>
-                  <p><strong>Duration:</strong> {booking.duration} hours</p>
-                  <p><strong>City:</strong> {booking.city}</p>
+                  <p><strong>Duration:</strong> {booking.duration} minutes</p>
+                  <p><strong>Price:</strong> ₹{booking.price}</p>
                   <p><strong>Status:</strong> <span className={`status-badge ${booking.status}`}>{booking.status}</span></p>
                 </div>
                 <div className="booking-actions">
+                  {booking.status === 'approved' && (
+                    <button 
+                      onClick={() => setActiveChatBookingId(booking.id)} 
+                      className="btn-chat"
+                    >
+                      💬 Open Chat
+                    </button>
+                  )}
                   {user?.role === 'admin' && booking.status === 'pending' && (
                     <>
                       <button onClick={() => handleApprove(booking.id)} className="btn-approve">
@@ -270,6 +270,14 @@ function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* Chat Window */}
+      {activeChatBookingId && (
+        <ChatWindow 
+          bookingId={activeChatBookingId}
+          onClose={() => setActiveChatBookingId(null)}
+        />
+      )}
     </div>
   );
 }

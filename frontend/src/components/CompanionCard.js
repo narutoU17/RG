@@ -4,7 +4,6 @@ import './CompanionCard.css';
 
 function CompanionCard({ companion }) {
   const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user'));
 
   const handleBook = () => {
     const token = localStorage.getItem('token');
@@ -26,19 +25,13 @@ function CompanionCard({ companion }) {
   return (
     <div className="companion-card">
       <div className="companion-image">
-        {companion.image_path ? (
-          <img 
-            src={`http://localhost:5000/api/companions/image/${companion.id}`} 
-            alt={companion.name}
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
-          />
-        ) : null}
-        <div className="placeholder-image" style={{ display: companion.image_path ? 'none' : 'flex' }}>
-          <span>{companion.name?.charAt(0)}</span>
-        </div>
+        {companion.image_url ? (
+          <img src={companion.image_url} alt={companion.name} />
+        ) : (
+          <div className="placeholder-image">
+            <span>{companion.name?.charAt(0)}</span>
+          </div>
+        )}
       </div>
       
       <div className="companion-details">
@@ -54,19 +47,18 @@ function CompanionCard({ companion }) {
         
         <div className="companion-footer">
           <div className="companion-price">
-            <span className="price-label">Price:</span>
-            <span className="price-value">${companion.price_per_hour}/hour</span>
+            <span className="price-label">Session Price:</span>
+            <span className="price-value">₹299</span>
+            <span className="price-duration">15 minutes</span>
           </div>
           <div className="companion-rating">
             ⭐ {companion.rating || 0}/5
           </div>
         </div>
-        {user?.role != 'companion' &&
-        
+
         <button onClick={handleBook} className="btn-book">
           Book Now
         </button>
-        }
       </div>
     </div>
   );

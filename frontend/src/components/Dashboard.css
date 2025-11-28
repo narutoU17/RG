@@ -121,6 +121,24 @@
   max-width: 600px;
 }
 
+.pricing-notice {
+  background: linear-gradient(135deg, #fff3e6 0%, #ffe8cc 100%);
+  border-left: 4px solid #667eea;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  color: #333;
+}
+
+.pricing-info {
+  background: #e8f5e9;
+  padding: 10px 15px;
+  border-radius: 8px;
+  color: #2e7d32;
+  font-weight: 600;
+  margin-top: 10px;
+}
+
 .checkbox-group {
   display: flex;
   align-items: center;
@@ -216,6 +234,24 @@
 .booking-actions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn-chat {
+  padding: 8px 16px;
+  background: #25d366;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-chat:hover {
+  background: #128c7e;
+  transform: scale(1.05);
 }
 
 .btn-approve,

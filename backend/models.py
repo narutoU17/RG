@@ -12,12 +12,13 @@ class User(db.Model):
     state = db.Column(db.String(100))
     district = db.Column(db.String(100))
     age = db.Column(db.Integer)
-    interests = db.Column(db.Text)  # Comma-separated interests
+    interests = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     # Relationships
     companion_profile = db.relationship('Companion', backref='user', uselist=False, cascade='all, delete-orphan')
     bookings = db.relationship('Booking', foreign_keys='Booking.user_id', backref='user', cascade='all, delete-orphan')
+    sent_messages = db.relationship('ChatMessage', foreign_keys='ChatMessage.sender_id', backref='sender', cascade='all, delete-orphan')
     
     def to_dict(self):
         return {
@@ -39,9 +40,8 @@ class Companion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, unique=True)
     bio = db.Column(db.Text)
-    price_per_hour = db.Column(db.Numeric(10, 2), nullable=False)
     rating = db.Column(db.Float, default=0.0)
-    image_url = db.Column(db.String(500))  # Back to image_url
+    image_url = db.Column(db.String(500))
     availability = db.Column(db.Boolean, default=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
@@ -58,7 +58,6 @@ class Companion(db.Model):
             'age': self.user.age if self.user else None,
             'interests': self.user.interests if self.user else None,
             'bio': self.bio,
-            'price_per_hour': float(self.price_per_hour) if self.price_per_hour else 0,
             'rating': self.rating,
             'image_url': self.image_url,
             'availability': self.availability,
@@ -73,10 +72,14 @@ class Booking(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     companion_id = db.Column(db.Integer, db.ForeignKey('companions.id'), nullable=False)
     date = db.Column(db.DateTime, nullable=False)
-    duration = db.Column(db.Integer, nullable=False)  # in hours
-    city = db.Column(db.String(100), nullable=False)
-    status = db.Column(db.Enum('pending', 'approved', 'rejected', name='booking_status'), default='pending', nullable=False)
+    duration = db.Column(db.Integer, default=15, nullable=False)  # Fixed 15 minutes
+    price = db.Column(db.Integer, default=299, nullable=False)  # Fixed ₹299
+    status = db.Column(db.Enum('pending', 'approved', 'rejected', 'completed', name='booking_status'), default='pending', nullable=False)
+    chat_enabled = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # Relationships
+    messages = db.relationship('ChatMessage', backref='booking', cascade='all, delete-orphan')
     
     def to_dict(self):
         return {
@@ -87,7 +90,28 @@ class Booking(db.Model):
             'companion_name': self.companion.user.name if self.companion and self.companion.user else None,
             'date': self.date.isoformat() if self.date else None,
             'duration': self.duration,
-            'city': self.city,
+            'price': self.price,
             'status': self.status,
+            'chat_enabled': self.chat_enabled,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
+
+
+class ChatMessage(db.Model):
+    __tablename__ = 'chat_messages'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    booking_id = db.Column(db.Integer, db.ForeignKey('bookings.id'), nullable=False)
+    sender_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'booking_id': self.booking_id,
+            'sender_id': self.sender_id,
+            'sender_name': self.sender.name if self.sender else None,
+            'message': self.message,
             'created_at': self.created_at.isoformat() if self.created_at else None
         }

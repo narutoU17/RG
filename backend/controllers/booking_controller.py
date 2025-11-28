@@ -13,7 +13,19 @@ def get_bookings():
     """Get current user's bookings"""
     try:
         user_id = get_current_user_id()
-        bookings = Booking.query.filter_by(user_id=user_id).all()
+        claims = get_jwt()
+        role = claims.get('role')
+        
+        # If companion, get bookings where they are the companion
+        if role == 'companion':
+            companion = Companion.query.filter_by(user_id=user_id).first()
+            if companion:
+                bookings = Booking.query.filter_by(companion_id=companion.id).all()
+            else:
+                bookings = []
+        else:
+            # If user, get their bookings
+            bookings = Booking.query.filter_by(user_id=user_id).all()
         
         return jsonify({
             'bookings': [booking.to_dict() for booking in bookings]
@@ -47,13 +59,13 @@ def get_all_bookings():
 @booking_bp.route('', methods=['POST'])
 @jwt_required()
 def create_booking():
-    """Create a new booking request"""
+    """Create a new booking request (15 min, ₹299)"""
     try:
         user_id = get_current_user_id()
         data = request.get_json()
         
-        # Validate required fields
-        required_fields = ['companion_id', 'date', 'duration', 'city']
+        # Validate required fields (only companion_id and date needed now)
+        required_fields = ['companion_id', 'date']
         for field in required_fields:
             if field not in data:
                 return jsonify({'error': f'{field} is required'}), 400
@@ -73,13 +85,13 @@ def create_booking():
         except:
             return jsonify({'error': 'Invalid date format. Use ISO format'}), 400
         
-        # Create booking
+        # Create booking with fixed duration (15 min) and price (₹299)
         new_booking = Booking(
             user_id=user_id,
             companion_id=data['companion_id'],
             date=booking_date,
-            duration=data['duration'],
-            city=data['city'],
+            duration=15,  # Fixed 15 minutes
+            price=299,    # Fixed ₹299
             status='pending'
         )
         
@@ -87,7 +99,7 @@ def create_booking():
         db.session.commit()
         
         return jsonify({
-            'message': 'Booking request created successfully',
+            'message': 'Booking request created successfully (15 min session - ₹299)',
             'booking': new_booking.to_dict()
         }), 201
         
@@ -99,7 +111,7 @@ def create_booking():
 @booking_bp.route('/<int:booking_id>/approve', methods=['PUT'])
 @jwt_required()
 def approve_booking(booking_id):
-    """Approve a booking (admin only)"""
+    """Approve a booking (admin only) - enables chat"""
     try:
         claims = get_jwt()
         
@@ -113,10 +125,11 @@ def approve_booking(booking_id):
             return jsonify({'error': 'Booking not found'}), 404
         
         booking.status = 'approved'
+        booking.chat_enabled = True  # Enable chat when approved
         db.session.commit()
         
         return jsonify({
-            'message': 'Booking approved successfully',
+            'message': 'Booking approved successfully - Chat enabled',
             'booking': booking.to_dict()
         }), 200
         
