@@ -55,6 +55,14 @@ function SignupForm() {
   };
 
   return (
+    <>
+    <nav className="navbar">
+        <div className="nav-brand" onClick={() => navigate('/')}>BondMate</div>
+        <div className="nav-links">
+          <button onClick={() => navigate('/')} className="nav-link">Home</button>
+        </div>
+      </nav>
+  
     <div className="form-container">
       <div className="form-card">
         <h2>Sign Up for BondMate</h2>
@@ -172,6 +180,14 @@ function SignupForm() {
         </p>
       </div>
     </div>
+       <footer className="footer">
+        <p>&copy; 2025 BondMate. All rights reserved.</p>
+        <p className="footer-disclaimer">
+          BondMate provides strictly platonic companionship services. 
+          We do not facilitate any adult or romantic services.
+        </p>
+      </footer>
+      </>
   );
 }
 

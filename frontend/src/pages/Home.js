@@ -111,7 +111,7 @@ function Home() {
       </div>
 
       <footer className="footer">
-        <p>&copy; 2024 BondMate. All rights reserved.</p>
+        <p>&copy; 2025 BondMate. All rights reserved.</p>
         <p className="footer-disclaimer">
           BondMate provides strictly platonic companionship services. 
           We do not facilitate any adult or romantic services.

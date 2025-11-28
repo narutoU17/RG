@@ -72,6 +72,9 @@ function Companions() {
     : filteredCompanions;
 
   return (
+    <>
+    
+    
     <div className="companions-container">
       <nav className="navbar">
         <div className="nav-brand" onClick={() => navigate('/')}>BondMate</div>
@@ -135,6 +138,14 @@ function Companions() {
         )}
       </div>
     </div>
+  <footer className="footer">
+        <p>&copy; 2025 BondMate. All rights reserved.</p>
+        <p className="footer-disclaimer">
+          BondMate provides strictly platonic companionship services. 
+          We do not facilitate any adult or romantic services.
+        </p>
+      </footer>
+    </>
   );
 }
 

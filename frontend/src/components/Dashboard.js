@@ -18,6 +18,7 @@ function Dashboard() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [activeChatBookingId, setActiveChatBookingId] = useState(null);
+  const [activeSection, setActiveSection] = useState('dashboard');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -129,156 +130,246 @@ function Dashboard() {
   if (loading) return <div className="dashboard-container">Loading...</div>;
 
   return (
+    <>
+     <nav className="navbar">
+      
+        <div className="nav-brand" onClick={() => navigate('/')}>BondMate</div>
+        <div className="nav-links">
+          {/* <button onClick={() => navigate('/')} className="nav-link">Home</button> */}
+          {/* <button onClick={() => navigate('/dashboard')} className="btn-primary">Dashboard</button> */}
+           {user?.role !== 'companion' && (
+              <button onClick={() => navigate('/companions')} className="btn-secondary">
+                Browse Companions
+              </button>
+            )}
+            <button onClick={handleLogout} className="btn-logout">
+              Logout
+            </button>
+             <h2>Welcome, {user?.name}!</h2>
+        </div>
+      </nav>
+   
     <div className="dashboard-container">
-      <div className="dashboard-header">
-        <h1>Dashboard</h1>
-        <div className="header-actions">
-          {user?.role !== 'companion' && (
-            <button onClick={() => navigate('/companions')} className="btn-secondary">
-              Browse Companions
+      <div className="sidebar">
+        <div className="sidebar-menu">
+          <button
+            className={`sidebar-item ${activeSection === 'dashboard' ? 'active' : ''}`}
+            onClick={() => setActiveSection('dashboard')}
+          >
+            📊 Dashboard
+          </button>
+          <button
+            className={`sidebar-item ${activeSection === 'booking' ? 'active' : ''}`}
+            onClick={() => setActiveSection('booking')}
+          >
+            📅 Booking
+          </button>
+          {user?.role === 'companion' && (
+            <button
+              className={`sidebar-item ${activeSection === 'bio' ? 'active' : ''}`}
+              onClick={() => setActiveSection('bio')}
+            >
+              📝 Bio
             </button>
           )}
-          <button onClick={handleLogout} className="btn-logout">
-            Logout
-          </button>
+          {/* <button
+            className={`sidebar-item ${activeSection === 'chat' ? 'active' : ''}`}
+            onClick={() => setActiveSection('chat')}
+          >
+            💬 Chat
+          </button> */}
         </div>
       </div>
 
-      <div className="user-info">
-        <h2>Welcome, {user?.name}!</h2>
-        <p>Role: <strong>{user?.role}</strong></p>
-        <p>Email: {user?.email}</p>
-        <p>Location: {user?.district}, {user?.state}</p>
-        {user?.interests && (
-          <p>Interests: <strong>{user.interests}</strong></p>
+      <div className="main-content">
+        
+
+        {activeSection === 'dashboard' && (
+          <>
+            <div className="section-header">
+              <h1>Dashboard</h1>
+            </div>
+            <div className="user-info">
+              <h2>User Name: {user?.name}</h2>
+              <p>Role: <strong>{user?.role}</strong></p>
+              <p>Email: {user?.email}</p>
+              <p>Location: {user?.district}, {user?.state}</p>
+              {user?.interests && (
+                <p>Interests: <strong>{user.interests}</strong></p>
+              )}
+            </div>
+            {error && <div className="error-message">{error}</div>}
+          </>
         )}
-      </div>
 
-      {error && <div className="error-message">{error}</div>}
-
-      {/* Companion Profile Creation */}
-      {user?.role === 'companion' && (
-        <div className="companion-profile-section">
-          <h3>{isEditing ? 'Update Your Companion Profile' : 'Create Your Companion Profile'}</h3>
-          
-          {companionProfile && (
-            <div className="current-profile">
-              <h4>Current Profile:</h4>
-              <p><strong>Bio:</strong> {companionProfile.bio}</p>
-              <p><strong>Status:</strong> {companionProfile.availability ? 'Available' : 'Unavailable'}</p>
-              <p className="pricing-info">💰 All sessions are 15 minutes at ₹299</p>
-              {companionProfile.image_url && (
-                <div className="profile-image-preview">
-                  <img src={companionProfile.image_url} alt="Profile" />
+        {activeSection === 'booking' && (
+          <>
+            <div className="section-header">
+              <h1>Bookings</h1>
+            </div>
+            <div className="bookings-section">
+              <h3>{user?.role === 'admin' ? 'All Bookings' : 'My Bookings'}</h3>
+              {bookings.length === 0 ? (
+                <p>No bookings found.</p>
+              ) : (
+                <div className="bookings-list">
+                  {bookings.map(booking => (
+                    <div key={booking.id} className={`booking-card status-${booking.status}`}>
+                      <div className="booking-info">
+                        <h4>Booking #{booking.id}</h4>
+                        <p><strong>User:</strong> {booking.user_name}</p>
+                        <p><strong>Companion:</strong> {booking.companion_name}</p>
+                        <p><strong>Date:</strong> {new Date(booking.date).toLocaleString()}</p>
+                        <p><strong>Duration:</strong> {booking.duration} minutes</p>
+                        <p><strong>Price:</strong> ₹{booking.price}</p>
+                        <p><strong>Status:</strong> <span className={`status-badge ${booking.status}`}>{booking.status}</span></p>
+                      </div>
+                      <div className="booking-actions">
+                        {booking.status === 'approved' && (
+                          <button
+                            onClick={() => setActiveChatBookingId(booking.id)}
+                            className="btn-chat"
+                          >
+                            💬 Open Chat
+                          </button>
+                        )}
+                        {user?.role === 'admin' && booking.status === 'pending' && (
+                          <>
+                            <button onClick={() => handleApprove(booking.id)} className="btn-approve">
+                              Approve
+                            </button>
+                            <button onClick={() => handleReject(booking.id)} className="btn-reject">
+                              Reject
+                            </button>
+                          </>
+                        )}
+                        {(user?.role === 'user' || user?.role === 'admin') && (
+                          <button onClick={() => handleDelete(booking.id)} className="btn-delete">
+                            Cancel
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
-          )}
+          </>
+        )}
 
-          <form onSubmit={handleCompanionSubmit} className="companion-form">
-            <div className="pricing-notice">
-              <strong>📌 Standard Pricing:</strong> All sessions are 15 minutes at ₹299
+        {activeSection === 'bio' && user?.role === 'companion' && (
+          <>
+            <div className="section-header">
+              <h1>Companion Bio</h1>
             </div>
-            
-            <div className="form-group">
-              <label>Bio</label>
-              <textarea
-                name="bio"
-                value={companionForm.bio}
-                onChange={handleCompanionChange}
-                placeholder="Tell about yourself"
-                rows="4"
-                required
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Image URL</label>
-              <input
-                type="url"
-                name="image_url"
-                value={companionForm.image_url}
-                onChange={handleCompanionChange}
-                placeholder="https://example.com/image.jpg"
-              />
-            </div>
-            
-            <div className="form-group checkbox-group">
-              <label>
-                <input
-                  type="checkbox"
-                  name="availability"
-                  checked={companionForm.availability}
-                  onChange={handleCompanionChange}
-                />
-                Available for bookings
-              </label>
-            </div>
-            
-            <button type="submit" className="btn-primary">
-              {isEditing ? 'Update Profile' : 'Create Profile'}
-            </button>
-          </form>
-        </div>
-      )}
+            <div className="companion-profile-section">
+              <h3>{isEditing ? 'Update Your Companion Profile' : 'Create Your Companion Profile'}</h3>
 
-      {/* Bookings Section */}
-      <div className="bookings-section">
-        <h3>{user?.role === 'admin' ? 'All Bookings' : 'My Bookings'}</h3>
-        {bookings.length === 0 ? (
-          <p>No bookings found.</p>
-        ) : (
-          <div className="bookings-list">
-            {bookings.map(booking => (
-              <div key={booking.id} className={`booking-card status-${booking.status}`}>
-                <div className="booking-info">
-                  <h4>Booking #{booking.id}</h4>
-                  <p><strong>User:</strong> {booking.user_name}</p>
-                  <p><strong>Companion:</strong> {booking.companion_name}</p>
-                  <p><strong>Date:</strong> {new Date(booking.date).toLocaleString()}</p>
-                  <p><strong>Duration:</strong> {booking.duration} minutes</p>
-                  <p><strong>Price:</strong> ₹{booking.price}</p>
-                  <p><strong>Status:</strong> <span className={`status-badge ${booking.status}`}>{booking.status}</span></p>
-                </div>
-                <div className="booking-actions">
-                  {booking.status === 'approved' && (
-                    <button 
-                      onClick={() => setActiveChatBookingId(booking.id)} 
-                      className="btn-chat"
-                    >
-                      💬 Open Chat
-                    </button>
-                  )}
-                  {user?.role === 'admin' && booking.status === 'pending' && (
-                    <>
-                      <button onClick={() => handleApprove(booking.id)} className="btn-approve">
-                        Approve
-                      </button>
-                      <button onClick={() => handleReject(booking.id)} className="btn-reject">
-                        Reject
-                      </button>
-                    </>
-                  )}
-                  {(user?.role === 'user' || user?.role === 'admin') && (
-                    <button onClick={() => handleDelete(booking.id)} className="btn-delete">
-                      Cancel
-                    </button>
+              {companionProfile && (
+                <div className="current-profile">
+                  <h4>Current Profile:</h4>
+                  <p><strong>Bio:</strong> {companionProfile.bio}</p>
+                  <p><strong>Status:</strong> {companionProfile.availability ? 'Available' : 'Unavailable'}</p>
+                  <p className="pricing-info">💰 All sessions are 15 minutes at ₹299</p>
+                  {companionProfile.image_url && (
+                    <div className="profile-image-preview">
+                      <img src={companionProfile.image_url} alt="Profile" />
+                    </div>
                   )}
                 </div>
-              </div>
-            ))}
-          </div>
+              )}
+
+              <form onSubmit={handleCompanionSubmit} className="companion-form">
+                <div className="pricing-notice">
+                  <strong>📌 Standard Pricing:</strong> All sessions are 15 minutes at ₹299
+                </div>
+
+                <div className="form-group">
+                  <label>Bio</label>
+                  <textarea
+                    name="bio"
+                    value={companionForm.bio}
+                    onChange={handleCompanionChange}
+                    placeholder="Tell about yourself"
+                    rows="4"
+                    required
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label>Image URL</label>
+                  <input
+                    type="url"
+                    name="image_url"
+                    value={companionForm.image_url}
+                    onChange={handleCompanionChange}
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+
+                <div className="form-group checkbox-group">
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="availability"
+                      checked={companionForm.availability}
+                      onChange={handleCompanionChange}
+                    />
+                    Available for bookings
+                  </label>
+                </div>
+
+                <button type="submit" className="btn-primary">
+                  {isEditing ? 'Update Profile' : 'Create Profile'}
+                </button>
+              </form>
+            </div>
+          </>
+        )}
+
+        {activeSection === 'chat' && (
+          <>
+            <div className="section-header">
+              <h1>Chat</h1>
+            </div>
+            <div className="chat-section">
+              <h3>Available Chats</h3>
+              {bookings.filter(booking => booking.status === 'approved').length === 0 ? (
+                <p>No approved bookings to chat with.</p>
+              ) : (
+                <div className="chat-list">
+                  {bookings.filter(booking => booking.status === 'approved').map(booking => (
+                    <div key={booking.id} className="chat-item" onClick={() => setActiveChatBookingId(booking.id)}>
+                      <div className="chat-info">
+                        <h4>Chat with {user?.role === 'user' ? booking.companion_name : booking.user_name}</h4>
+                        <p>Booking #{booking.id} - {new Date(booking.date).toLocaleString()}</p>
+                      </div>
+                      <span className="chat-icon">💬</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Chat Window */}
+        {activeChatBookingId && (
+          <ChatWindow
+            bookingId={activeChatBookingId}
+            onClose={() => setActiveChatBookingId(null)}
+          />
         )}
       </div>
-
-      {/* Chat Window */}
-      {activeChatBookingId && (
-        <ChatWindow 
-          bookingId={activeChatBookingId}
-          onClose={() => setActiveChatBookingId(null)}
-        />
-      )}
     </div>
+       <footer className="footer">
+        <p>&copy; 2025 BondMate. All rights reserved.</p>
+        <p className="footer-disclaimer">
+          BondMate provides strictly platonic companionship services. 
+          We do not facilitate any adult or romantic services.
+        </p>
+      </footer>
+     </>
   );
 }
 
