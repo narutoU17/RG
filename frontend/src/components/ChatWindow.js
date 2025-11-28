@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './ChatWindow.css';
 
-function ChatWindow({ bookingId, onClose }) {
+function ChatWindow({ bookingId, onClose, isFullPage = false }) {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const [chatEnabled, setChatEnabled] = useState(false);
@@ -106,7 +106,7 @@ function ChatWindow({ bookingId, onClose }) {
   }
 
   return (
-    <div className="chat-window">
+    <div className={`chat-window ${isFullPage ? 'full-page' : ''}`}>
       <div className="chat-header">
         <div>
           <h3>Chat - Booking #{bookingId}</h3>
@@ -116,7 +116,7 @@ function ChatWindow({ bookingId, onClose }) {
             <span className="timer expired">Chat Disabled</span>
           )}
         </div>
-        <button onClick={onClose} className="close-btn">✕</button>
+        {!isFullPage && <button onClick={onClose} className="close-btn">✕</button>}
       </div>
 
       <div className="messages-container">

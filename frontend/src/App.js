@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Companions from './pages/Companions';
+import ChatPage from './pages/ChatPage';
 import Booking from './pages/Booking';
 // import Profile from './pages/Profile';
 import LoginForm from './components/LoginForm';
@@ -47,13 +48,21 @@ function App() {
               </ProtectedRoute>
             } 
           />
-          <Route 
-            path="/profile" 
+          <Route
+            path="/profile"
             element={
               <ProtectedRoute>
                 <Profile />
               </ProtectedRoute>
-            } 
+            }
+          />
+          <Route
+            path="/chat"
+            element={
+              <ProtectedRoute>
+                <ChatPage />
+              </ProtectedRoute>
+            }
           />
         </Routes>
       </div>

@@ -68,7 +68,7 @@ def send_message(booking_id):
             return jsonify({'error': 'Chat is only available for approved bookings'}), 403
         
         from datetime import datetime, timedelta
-        booking_end = booking.date + timedelta(hours=booking.duration)
+        booking_end = booking.date + timedelta(minutes=booking.duration)
         if datetime.utcnow() > booking_end:
             return jsonify({'error': 'Booking time has ended'}), 403
         

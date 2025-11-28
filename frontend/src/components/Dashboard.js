@@ -66,7 +66,7 @@ function Dashboard() {
   const handleLogout = () => {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
-    navigate('/login');
+    navigate('/');
   };
 
   const handleApprove = async (bookingId) => {
@@ -172,12 +172,12 @@ function Dashboard() {
               📝 Bio
             </button>
           )}
-          {/* <button
+          <button
             className={`sidebar-item ${activeSection === 'chat' ? 'active' : ''}`}
-            onClick={() => setActiveSection('chat')}
+            onClick={() => navigate('/chat')}
           >
             💬 Chat
-          </button> */}
+          </button>
         </div>
       </div>
 
