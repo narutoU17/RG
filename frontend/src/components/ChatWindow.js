@@ -150,12 +150,12 @@ function ChatWindow({ bookingId, onClose }) {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder={chatEnabled ? "Type your message..." : "Chat is disabled"}
-        //   disabled={!chatEnabled}
+          disabled={!chatEnabled}
           className="message-input"
         />
         <button
           type="submit"
-        //   disabled={!chatEnabled || !newMessage.trim()}
+          disabled={!chatEnabled || !newMessage.trim()}
           className="send-btn"
         >
           Send

@@ -12,6 +12,7 @@ from controllers.auth_controller import auth_bp
 from controllers.user_controller import user_bp
 from controllers.companion_controller import companion_bp
 from controllers.booking_controller import booking_bp
+from controllers.chat_controller import chat_bp
 
 def create_app():
     """Application factory"""
@@ -26,7 +27,15 @@ def create_app():
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', '2a3b4c5d6e7f8g9h0i1j2k3l4m5n6o7p8q9r0s1t2u3v4w5x6y7z8A9B0C1D2E3F')
 
     # Initialize extensions
-    CORS(app)
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": ["http://localhost:3000"],
+            "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+            "allow_headers": ["Content-Type", "Authorization", "Accept"],
+            "expose_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": True
+        }
+    })
     JWTManager(app)
 
     # Initialize database
@@ -37,6 +46,7 @@ def create_app():
     app.register_blueprint(user_bp)
     app.register_blueprint(companion_bp)
     app.register_blueprint(booking_bp)
+    app.register_blueprint(chat_bp)
 
     # Root endpoint
     @app.route('/')
