@@ -11,19 +11,18 @@ function ChatWindow({ bookingId, onClose }) {
   const [currentUser, setCurrentUser] = useState(null);
   const messagesEndRef = useRef(null);
   const intervalRef = useRef(null);
-
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem('user'));
+    const user = JSON.parse(sessionStorage.getItem('user'));
     setCurrentUser(user);
     fetchMessages();
     checkChatStatus();
 
     // Poll for new messages every 3 seconds
     const messageInterval = setInterval(fetchMessages, 3000);
-    
+
     // Check chat status every second
     const statusInterval = setInterval(checkChatStatus, 1000);
-    
+
     intervalRef.current = { messageInterval, statusInterval };
 
     return () => {
@@ -42,7 +41,7 @@ function ChatWindow({ bookingId, onClose }) {
 
   const fetchMessages = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await axios.get(
         `http://localhost:5000/api/chat/bookings/${bookingId}/messages`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -58,7 +57,7 @@ function ChatWindow({ bookingId, onClose }) {
 
   const checkChatStatus = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await axios.get(
         `http://localhost:5000/api/chat/bookings/${bookingId}/status`,
         { headers: { Authorization: `Bearer ${token}` } }
@@ -76,7 +75,7 @@ function ChatWindow({ bookingId, onClose }) {
     if (!newMessage.trim() || !chatEnabled) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       await axios.post(
         `http://localhost:5000/api/chat/bookings/${bookingId}/messages`,
         { message: newMessage },

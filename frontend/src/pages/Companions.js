@@ -14,11 +14,11 @@ function Companions() {
 
   useEffect(() => {
     // Get user info
-    const userData = localStorage.getItem('user');
+    const userData = sessionStorage.getItem('user');
     if (userData) {
       const parsedUser = JSON.parse(userData);
       setUser(parsedUser);
-      
+
       // Check if user is a companion trying to access this page
       if (parsedUser.role === 'companion') {
         alert('Companions cannot book other companions. This page is for users only.');
@@ -26,7 +26,7 @@ function Companions() {
         return;
       }
     }
-    
+
     fetchCompanions();
   }, [navigate]);
 

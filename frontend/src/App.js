@@ -11,7 +11,7 @@ import Profile from './pages/ Profile';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   return token ? children : <Navigate to="/login" />;
 };
 
